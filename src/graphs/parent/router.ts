@@ -5,7 +5,7 @@ export const DOMAIN = {
 } as const;
 
 export type Domain =
-    (typeof DOMAIN)[keyof typeof DOMAIN];
+    (typeof DOMAIN)[keyof typeof DOMAIN] | undefined;
 
 export function detectDomain(message: string): Domain {
     const text = message.toLowerCase();

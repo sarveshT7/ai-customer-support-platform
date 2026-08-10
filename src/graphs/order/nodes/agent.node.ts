@@ -18,26 +18,6 @@ export async function agentNode(
     JSON.stringify(response.tool_calls, null, 2)
   );
 
-  const cancelToolCall = response.tool_calls?.find(
-    (tool) => tool.name === "cancel_order"
-  );
-
-  if (cancelToolCall) {
-    const approval = interrupt({
-      type: "cancel_order",
-      orderId: cancelToolCall.args.orderId,
-      message: `Approve cancellation of order ${cancelToolCall.args.orderId}?`,
-    });
-
-    if (approval.toLowerCase() !== "y") {
-      return {
-        messages: [
-          new AIMessage("Cancellation of order is rejected"),
-        ],
-      };
-    }
-  }
-
   return {
     messages: [response],
   };

@@ -1,10 +1,10 @@
-import { Annotation } from "@langchain/langgraph";
+import { Annotation, messagesStateReducer } from "@langchain/langgraph";
 import { BaseMessage } from "@langchain/core/messages";
 import { Domain, DOMAIN } from "./router.js";
 
 export const ParentState = Annotation.Root({
     messages: Annotation<BaseMessage[]>({
-        reducer: (current, update) => current.concat(update),
+        reducer: messagesStateReducer,
         default: () => [],
     }),
     domain: Annotation<Domain>({
