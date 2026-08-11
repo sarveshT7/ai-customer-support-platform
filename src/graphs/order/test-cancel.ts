@@ -11,7 +11,8 @@ const config = {
 const firstResult = await orderGraph.invoke(
     {
         messages: [
-            new HumanMessage("Please cancel order ORD-1001"),
+            // new HumanMessage("Please cancel order ORD-1001"),
+            new HumanMessage("where is my order ORD-100199"),
         ],
     },
     config
@@ -22,7 +23,7 @@ console.dir(firstResult, { depth: null });
 
 const secondResult = await orderGraph.invoke(
     new Command({
-        resume: "y"
+        resume: "n"
     }),
     config
 );

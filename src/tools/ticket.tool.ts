@@ -54,6 +54,7 @@ export const createTicketTool = tool(
                 "Warranty"
             ])
                 .describe("Support ticket category."),
+            orderId: z.string().describe("The order ID, for example ORD-1001. Use the exact field name orderId."),
 
             priority: z.enum(["Low", "Medium", "High", "Critical"])
                 .describe("Low for minor issues, Medium for normal support, High for urgent issues, Critical for severe safety or business-impacting issues.Choose exactly one of: Low, Medium, High, Critical."),

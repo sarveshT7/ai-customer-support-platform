@@ -1,4 +1,20 @@
-import { SupportState } from "../state.js";
+import { Annotation } from "@langchain/langgraph";
+import { BaseMessage } from "@langchain/core/messages";
 
+export const SupportState = Annotation.Root({
+    messages: Annotation<BaseMessage[]>({
+        reducer: (current, update) => current.concat(update),
+        default: () => [],
+    }),
 
-export { SupportState }
+    ticket: Annotation<{
+        requested: boolean;
+        orderId?: string;
+        verified?: boolean;
+        orderExists?: boolean;
+        message?: string;
+    }>({
+        reducer: (_, update) => update,
+        default: () => ({ requested: false })
+    }),
+});
