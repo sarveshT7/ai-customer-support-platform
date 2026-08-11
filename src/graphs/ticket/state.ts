@@ -14,7 +14,7 @@ export const SupportState = Annotation.Root({
         orderExists?: boolean;
         message?: string;
     }>({
-        reducer: (_, update) => update,
+        reducer: (current, update) => ({ ...current, ...update }),
         default: () => ({ requested: false })
     }),
 });

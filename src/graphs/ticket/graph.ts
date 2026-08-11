@@ -1,4 +1,4 @@
-import { END, START, StateGraph } from "@langchain/langgraph";
+import { END, MemorySaver, START, StateGraph } from "@langchain/langgraph";
 import { toolsCondition } from "@langchain/langgraph/prebuilt";
 import { agentNode } from "./nodes/agent.node.js";
 import { SupportState } from "./state.js";
@@ -8,6 +8,7 @@ import { ticketNode } from "./nodes/ticket.node.js";
 import { ticketResponseNode } from "./nodes/ticket.response.node.js";
 
 
+const memory = new MemorySaver()
 
 export const ticketGraph = new StateGraph(SupportState)
   .addNode("detectTicket", ticketNode)
@@ -48,4 +49,6 @@ export const ticketGraph = new StateGraph(SupportState)
   .addEdge("ticketResponse", END)
   .addConditionalEdges("agent", toolsCondition)
   .addEdge("tools", "agent")
-  .compile();
+  .compile({
+    checkpointer: memory,
+  });
