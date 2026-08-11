@@ -11,6 +11,10 @@ export const SupportState = Annotation.Root({
         requested: boolean;
         orderId?: string;
         approved?: boolean;
+        verified?: boolean;
+        canCancel?: boolean;
+        success?: boolean;
+        message?: string;
     }>({
         reducer: (_, update) => update,
         default: () => ({

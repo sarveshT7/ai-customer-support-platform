@@ -17,11 +17,11 @@ export async function cancelNode(
     const result = await orderService.cancelOrder(
         cancellation.orderId
     );
-
+    console.log("Cancellation service result:", result);
     return {
         cancellation: {
             ...cancellation,
-            success:result.success,
+            success: result.success,
             message: result.message,
         },
     };

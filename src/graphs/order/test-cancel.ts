@@ -22,7 +22,7 @@ console.dir(firstResult, { depth: null });
 
 const secondResult = await orderGraph.invoke(
     new Command({
-        resume: "n"
+        resume: "y"
     }),
     config
 );

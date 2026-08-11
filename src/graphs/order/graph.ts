@@ -14,14 +14,18 @@ import { cancelNode } from "./nodes/cancel.node.js";
 
 import { orderToolsNode } from "./tools.node.js";
 import { toolsCondition } from "@langchain/langgraph/prebuilt";
+import { verifyCancellationNode } from "./nodes/verify-cancellation.node.js";
+import { cancellationResponseNode } from "./nodes/cancellation-response.node.js";
 
 const memory = new MemorySaver()
 
 export const orderGraph = new StateGraph(SupportState)
 
   .addNode("detectCancellation", cancellationNode)
+  .addNode("verifyCancellation", verifyCancellationNode)
   .addNode("approval", cancellationApprovalNode)
   .addNode("cancel", cancelNode)
+  .addNode("cancellationResponse", cancellationResponseNode)
 
   .addNode("agent", agentNode)
   .addNode("tools", orderToolsNode)
@@ -32,17 +36,29 @@ export const orderGraph = new StateGraph(SupportState)
     "detectCancellation",
     (state) => {
       if (state.cancellation.requested) {
-        return "approval";
+        return "verifyCancellation";
       }
 
       return "agent";
     },
     {
-      approval: "approval",
+      verifyCancellation: "verifyCancellation",
       agent: "agent",
     }
   )
 
+  .addConditionalEdges(
+    "verifyCancellation",
+    (state) => {
+      return state.cancellation.canCancel
+        ? "approval"
+        : "cancellationResponse";
+    },
+    {
+      approval: "approval",
+      cancellationResponse: "cancellationResponse",
+    }
+  )
   .addConditionalEdges(
     "approval",
     (state) => {
@@ -52,11 +68,12 @@ export const orderGraph = new StateGraph(SupportState)
     },
     {
       cancel: "cancel",
-      [END]: END,
+      [END]: END
     }
   )
 
-  .addEdge("cancel", END)
+  .addEdge("cancel", "cancellationResponse")
+  .addEdge("cancellationResponse", END)
 
   .addConditionalEdges("agent", toolsCondition)
 
