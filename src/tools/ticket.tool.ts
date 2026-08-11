@@ -5,12 +5,13 @@ import { tickets } from "../data/tickets.js";
 
 
 export const createTicketTool = tool(
-    async ({ issue, category, priority }: { issue: string, category: string, priority: TicketPriority }) => {
-        const customerId = "CUS-101";
+    async ({ issue, category, priority, orderId }: { issue: string, category: string, priority: TicketPriority, orderId: string }) => {
+
         const ticket: Ticket = {
             ticketId: `TKT-${crypto.randomUUID()}`,
             issue,
             category,
+            orderId,
             priority,
             status: "Open",
             createdAt: new Date().toISOString(),
@@ -54,7 +55,7 @@ export const createTicketTool = tool(
                 "Warranty"
             ])
                 .describe("Support ticket category."),
-            orderId: z.string().describe("The order ID, for example ORD-1001. Use the exact field name orderId."),
+            orderId: z.string().describe("The order ID, for example ORD-1001. Use the exact field name orderId.").min(1),
 
             priority: z.enum(["Low", "Medium", "High", "Critical"])
                 .describe("Low for minor issues, Medium for normal support, High for urgent issues, Critical for severe safety or business-impacting issues.Choose exactly one of: Low, Medium, High, Critical."),

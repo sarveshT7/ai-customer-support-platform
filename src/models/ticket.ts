@@ -8,6 +8,7 @@ export interface Ticket {
     // customerId: string;
     issue: string;
     category: string;
+    orderId: string;
     priority: TicketPriority;
     status: TicketStatus;
     createdAt: string;

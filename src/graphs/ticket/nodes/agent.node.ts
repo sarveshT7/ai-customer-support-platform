@@ -1,4 +1,4 @@
-import { AIMessage } from "@langchain/core/messages";
+import { AIMessage, HumanMessage } from "@langchain/core/messages";
 import { interrupt } from "@langchain/langgraph";
 
 import { SupportState } from "../state.js";
@@ -8,8 +8,14 @@ import { ticketModel } from "../model.js";
 export async function agentNode(
   state: typeof SupportState.State
 ) {
+  const ticketContext = `
+Ticket state:
+${JSON.stringify(state.ticket)}
+`;
+
   const response = await ticketModel.invoke([
     SYSTEM_PROMPT,
+    new HumanMessage(ticketContext),
     ...state.messages,
   ]);
 
