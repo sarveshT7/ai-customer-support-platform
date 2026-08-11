@@ -17,6 +17,15 @@ export async function ticketNode(
     const isTicketRequest =
         /\b(ticket|support ticket|create.*ticket)\b/i.test(content);
 
+    // New order ID supplied after the initial ticket request
+    if (orderIdMatch && state.ticket.requested) {
+        return {
+            ticket: {
+                orderId: orderIdMatch[0].toUpperCase(),
+            },
+        };
+    }
+
     if (!isTicketRequest) {
         return {};
     }
@@ -24,7 +33,9 @@ export async function ticketNode(
     return {
         ticket: {
             requested: true,
-            orderId: orderIdMatch?.[0].toUpperCase(),
+            ...(orderIdMatch
+                ? { orderId: orderIdMatch[0].toUpperCase() }
+                : {}),
         },
-    };
+    }
 }
