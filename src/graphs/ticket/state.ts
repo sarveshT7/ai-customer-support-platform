@@ -13,6 +13,8 @@ export const SupportState = Annotation.Root({
         verified?: boolean;
         orderExists?: boolean;
         message?: string;
+        created?: boolean;
+        ticketId?: string;
     }>({
         reducer: (current, update) => ({ ...current, ...update }),
         default: () => ({ requested: false })

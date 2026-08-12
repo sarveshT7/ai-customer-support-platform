@@ -11,5 +11,9 @@ export interface Ticket {
     orderId: string;
     priority: TicketPriority;
     status: TicketStatus;
+    requested?: boolean;
+    verified?: boolean;
+    orderExists?: boolean;
+    created?: boolean;
     createdAt: string;
 }

@@ -15,7 +15,9 @@ export async function ticketNode(
     const orderIdMatch = content.match(/\bORD-\d+\b/i);
 
     const isTicketRequest =
-        /\b(ticket|support ticket|create.*ticket)\b/i.test(content);
+        /\b(create|raise|open|report|submit)\b.*\b(ticket|support ticket)\b/i.test(
+            content
+        );
 
     // New order ID supplied after the initial ticket request
     if (orderIdMatch && state.ticket.requested) {

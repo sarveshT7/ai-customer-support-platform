@@ -16,7 +16,7 @@ export async function verifyOrderNode(
         return {
             ticket: {
                 ...ticket,
-                verified: true,
+                verified: false,
                 orderExists: false,
                 message: `Order ${ticket.orderId} was not found.`,
             },
@@ -25,6 +25,7 @@ export async function verifyOrderNode(
 
     return {
         ticket: {
+            ...ticket,
             verified: true,
             orderExists: true,
             message: `Order ${ticket.orderId} was verified.`,

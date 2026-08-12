@@ -9,10 +9,11 @@ let shouldFail = true;
 export const createTicketTool = tool(
     async ({ issue, category, priority, orderId }: { issue: string, category: string, priority: TicketPriority, orderId: string }) => {
         return withRetry(async () => {
-            if (shouldFail) {
-                shouldFail = false;
+            // if (shouldFail) {
+                // console.log("shouldFail:", shouldFail);
+                // shouldFail = false;
                 throw new Error("Simulated timeout");
-            }
+            // }
 
             const ticket: Ticket = {
                 ticketId: `TKT-${crypto.randomUUID()}`,
