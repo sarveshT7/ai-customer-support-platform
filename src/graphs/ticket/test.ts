@@ -3,25 +3,65 @@ import { ticketGraph } from "./graph.js";
 
 const config = {
     configurable: {
-        thread_id: "ticket-test-1",
+        thread_id: "customer-1",
     },
 };
 
-const result = await ticketGraph.invoke(
+// Request 1
+const result1 = await ticketGraph.invoke(
     {
         messages: [
-            new HumanMessage("My laptop is damaged. Please create a support ticket."),
+            new HumanMessage(
+                "My laptop is damaged. Please create a support ticket."
+            ),
         ],
     },
     config
 );
+
+console.log("\n--- RESULT 1 ---");
+console.log(result1);
+
+// Request 2 — SAME thread_id
 const result2 = await ticketGraph.invoke(
     {
-        messages: [new HumanMessage("ORD-1001")],
+        messages: [
+            new HumanMessage("ORD-1003"),
+        ],
     },
     config
 );
-console.log("result1");
-console.dir(result, { depth: null });
-console.log("\n result2");
-console.dir(result2, { depth: null });
+
+console.log("\n--- RESULT 2 ---");
+console.log(result2);
+
+// // Request 3 — SAME thread_id
+// const result3 = await ticketGraph.invoke(
+//     {
+//         messages: [
+//             new HumanMessage("What is the status of my ticket?"),
+//         ],
+//     },
+//     config
+// );
+
+// console.log("\n--- RESULT 3 ---");
+// console.log(result3);
+
+// // const newThreadConfig = {
+// //     configurable: {
+// //         thread_id: "customer-2",
+// //     },
+// // };
+
+// const result4 = await ticketGraph.invoke(
+//     {
+//         messages: [
+//             new HumanMessage("Actually, I want to report a different issue with my mouse."),
+//         ],
+//     },
+//     config
+// );
+
+// console.log("\n--- RESULT 4  ---");
+// console.log(result4);

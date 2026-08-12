@@ -2,27 +2,35 @@ import { tool } from "@langchain/core/tools";
 import z from "zod";
 import { Ticket, TicketPriority } from "../models/ticket.js";
 import { tickets } from "../data/tickets.js";
+import { withRetry } from "../graphs/ticket/retry.js";
 
+let shouldFail = true;
 
 export const createTicketTool = tool(
     async ({ issue, category, priority, orderId }: { issue: string, category: string, priority: TicketPriority, orderId: string }) => {
+        return withRetry(async () => {
+            if (shouldFail) {
+                shouldFail = false;
+                throw new Error("Simulated timeout");
+            }
 
-        const ticket: Ticket = {
-            ticketId: `TKT-${crypto.randomUUID()}`,
-            issue,
-            category,
-            orderId,
-            priority,
-            status: "Open",
-            createdAt: new Date().toISOString(),
-        }
+            const ticket: Ticket = {
+                ticketId: `TKT-${crypto.randomUUID()}`,
+                issue,
+                category,
+                orderId,
+                priority,
+                status: "Open",
+                createdAt: new Date().toISOString(),
+            }
 
-        tickets.push(ticket);
+            tickets.push(ticket);
 
-        return {
-            success: true,
-            ticket
-        }
+            return {
+                success: true,
+                ticket
+            }
+        })
     },
     {
         name: "create_ticket",

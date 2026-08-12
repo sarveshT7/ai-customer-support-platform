@@ -11,4 +11,10 @@ export const orders = [
       status: "Delivered",
       expectedDelivery: "Yesterday",
     },
+    {
+      id: "ORD-1003",
+      customer: "Jane",
+      status: "Processing",
+      expectedDelivery: "Day after tomorrow",
+    }
   ];

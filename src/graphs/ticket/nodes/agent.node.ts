@@ -9,15 +9,16 @@ export async function agentNode(
   state: typeof SupportState.State
 ) {
   const ticketContext = `
-Ticket state:
-${JSON.stringify(state.ticket)}
-`;
+  Ticket state:
+  ${JSON.stringify(state.ticket)}
+  `;
 
   const response = await ticketModel.invoke([
     SYSTEM_PROMPT,
     ...state.messages,
     new HumanMessage(ticketContext),
   ]);
+  // console.log("AI response:", response.content);
 
   console.log(
     "Tool calls:",
