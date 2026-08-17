@@ -9,13 +9,16 @@
   "type": "module",
   "scripts": {
     "dev": "tsx src/app.ts",
-    "db:migrate": "tsx src/database/migrate.ts"
+    "db:migrate": "tsx src/database/migrate.ts",
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",
     "@types/pg": "^8.21.0",
     "tsx": "^4.23.1",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
   },
   "dependencies": {
     "@langchain/community": "^1.1.29",
