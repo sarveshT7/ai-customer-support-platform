@@ -12,6 +12,39 @@ export interface ChunkingOptions {
     countTokens: (text: string) => number;
 }
 
+
+function splitOversizedBlock(
+    text: string,
+    maxTokens: number,
+    countTokens: (text: string) => number,
+): string[] {
+    const words = text.trim().split(/\s+/);
+
+    const parts: string[] = [];
+
+    let current: string[] = [];
+
+    for (const word of words) {
+        const candidate = [...current, word].join(" ");
+
+        if (
+            current.length > 0 &&
+            countTokens(candidate) > maxTokens
+        ) {
+            parts.push(current.join(" "));
+            current = [word];
+        } else {
+            current.push(word);
+        }
+    }
+
+    if (current.length > 0) {
+        parts.push(current.join(" "));
+    }
+
+    return parts;
+}
+
 export function chunkBlocks(blocks: ParsedBlock[], options: ChunkingOptions): PreparedChunk[] {
     const chunks: PreparedChunk[] = [];
 
@@ -47,6 +80,32 @@ export function chunkBlocks(blocks: ParsedBlock[], options: ChunkingOptions): Pr
             continue;
         }
         const blockTokenCount = options.countTokens(block.text);
+        // Over sized block
+        if (blockTokenCount > options.maxTokens) {
+            const parts = splitOversizedBlock(
+                block.text,
+                options.maxTokens,
+                options.countTokens,
+            );
+
+            for (const part of parts) {
+                const partTokenCount = options.countTokens(part);
+
+                if (
+                    currentContent.length > 0 &&
+                    currentTokenCount + partTokenCount > options.targetTokens
+                ) {
+                    flushChunk();
+                }
+
+                currentContent.push(part);
+                currentTokenCount += partTokenCount;
+            }
+
+            continue;
+        }
+
+        // Normal block
         if (
             currentContent.length > 0 &&
             currentTokenCount + blockTokenCount > options.targetTokens

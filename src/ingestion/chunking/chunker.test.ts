@@ -108,4 +108,31 @@ describe("chunkBlocks", () => {
             true
         );
     });
+    it("splits an oversized block at max token limit", () => {
+            const blocks = [
+                {
+                    kind: "heading" as const,
+                    level: 1,
+                    text: "Warranty",
+                },
+                {
+                    kind: "paragraph" as const,
+                    text: "One two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty",
+                },
+            ];
+
+            const result = chunkBlocks(blocks, {
+                targetTokens: 10,
+                maxTokens: 15,
+                countTokens,
+            });
+
+            console.log("oversized result", JSON.stringify(result, null, 2));
+
+            expect(result).toHaveLength(2);
+
+            expect(result.every((chunk) => {
+                return countTokens(chunk.content) <= 15;
+            })).toBe(true);
+        });
 });
