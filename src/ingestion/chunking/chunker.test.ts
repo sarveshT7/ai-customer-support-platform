@@ -39,6 +39,7 @@ describe("chunkBlocks", () => {
         const result = chunkBlocks(sectionBlocks, {
             targetTokens: 100,
             maxTokens: 100,
+            overlapTokens: 0,
             countTokens,
         });
         console.log('result 1', JSON.stringify(result, null, 2));
@@ -86,6 +87,7 @@ describe("chunkBlocks", () => {
         const result = chunkBlocks(blocks, {
             targetTokens: 10,
             maxTokens: 15,
+            overlapTokens: 0,
             countTokens,
         });
         console.log('result 2', JSON.stringify(result, null, 2));
@@ -109,30 +111,74 @@ describe("chunkBlocks", () => {
         );
     });
     it("splits an oversized block at max token limit", () => {
-            const blocks = [
-                {
-                    kind: "heading" as const,
-                    level: 1,
-                    text: "Warranty",
-                },
-                {
-                    kind: "paragraph" as const,
-                    text: "One two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty",
-                },
-            ];
+        const blocks = [
+            {
+                kind: "heading" as const,
+                level: 1,
+                text: "Warranty",
+            },
+            {
+                kind: "paragraph" as const,
+                text: "One two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty",
+            },
+        ];
 
-            const result = chunkBlocks(blocks, {
-                targetTokens: 10,
-                maxTokens: 15,
-                countTokens,
-            });
-
-            console.log("oversized result", JSON.stringify(result, null, 2));
-
-            expect(result).toHaveLength(2);
-
-            expect(result.every((chunk) => {
-                return countTokens(chunk.content) <= 15;
-            })).toBe(true);
+        const result = chunkBlocks(blocks, {
+            targetTokens: 10,
+            maxTokens: 15,
+            countTokens,
+            overlapTokens: 0,
         });
+
+        console.log("oversized result", JSON.stringify(result, null, 2));
+
+        expect(result).toHaveLength(2);
+
+        expect(result.every((chunk) => {
+            return countTokens(chunk.content) <= 15;
+        })).toBe(true);
+    });
+    it("adds overlap between chunks", () => {
+        const blocks = [
+            {
+                kind: "heading" as const,
+                level: 1,
+                text: "Return Policy",
+            },
+            {
+                kind: "paragraph" as const,
+                text: "One two three four five",
+            },
+            {
+                kind: "paragraph" as const,
+                text: "six seven eight nine ten",
+            },
+            {
+                kind: "paragraph" as const,
+                text: "eleven twelve thirteen fourteen fifteen",
+            },
+        ];
+
+        const result = chunkBlocks(blocks, {
+            targetTokens: 10,
+            maxTokens: 15,
+            overlapTokens: 3,
+            countTokens,
+        });
+
+        console.log(
+            "overlap result",
+            JSON.stringify(result, null, 2),
+        );
+
+        expect(result).toHaveLength(2);
+
+        expect(result[0].content).toBe(
+            "One two three four five\n\nsix seven eight nine ten"
+        );
+
+        expect(result[1].content).toBe(
+            "eight nine ten\n\neleven twelve thirteen fourteen fifteen"
+        );
+    });
 });

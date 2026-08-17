@@ -9,6 +9,7 @@ export interface PreparedChunk {
 export interface ChunkingOptions {
     targetTokens: number;
     maxTokens: number;
+    overlapTokens: number;
     countTokens: (text: string) => number;
 }
 
@@ -52,7 +53,7 @@ export function chunkBlocks(blocks: ParsedBlock[], options: ChunkingOptions): Pr
     let currentContent: string[] = [];
     let currentTokenCount = 0;
 
-    const flushChunk = () => {
+    const flushChunk = (withOverlap: boolean = true) => {
         const content = currentContent.join("\n\n").trim();
 
         if (!content) {
@@ -65,13 +66,27 @@ export function chunkBlocks(blocks: ParsedBlock[], options: ChunkingOptions): Pr
             section: sectionPath.join(" > "),
         });
 
-        currentContent = [];
-        currentTokenCount = 0;
+        if (withOverlap && options.overlapTokens > 0) {
+            const words = content.split(/\s+/);
+
+            const overlap = words.slice(-options.overlapTokens);
+
+            currentContent = overlap.length > 0
+                ? [overlap.join(" ")]
+                : [];
+
+            currentTokenCount = options.countTokens(
+                currentContent.join(" ")
+            );
+        } else {
+            currentContent = [];
+            currentTokenCount = 0;
+        }
     };
 
     for (const block of blocks) {
         if (block.kind === "heading") {
-            flushChunk();
+            flushChunk(false);
 
             sectionPath.splice(block.level - 1);
 
@@ -110,7 +125,7 @@ export function chunkBlocks(blocks: ParsedBlock[], options: ChunkingOptions): Pr
             currentContent.length > 0 &&
             currentTokenCount + blockTokenCount > options.targetTokens
         ) {
-            flushChunk();
+            flushChunk(true);
         }
 
         currentContent.push(block.text);
