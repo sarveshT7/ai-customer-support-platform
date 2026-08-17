@@ -6,11 +6,18 @@ export interface PreparedChunk {
     section: string;
 }
 
-export function chunkBlocks(blocks: ParsedBlock[]): PreparedChunk[] {
+export interface ChunkingOptions {
+    targetTokens: number;
+    maxTokens: number;
+    countTokens: (text: string) => number;
+}
+
+export function chunkBlocks(blocks: ParsedBlock[], options: ChunkingOptions): PreparedChunk[] {
     const chunks: PreparedChunk[] = [];
 
     const sectionPath: string[] = [];
     let currentContent: string[] = [];
+    let currentTokenCount = 0;
 
     const flushChunk = () => {
         const content = currentContent.join("\n\n").trim();
@@ -26,6 +33,7 @@ export function chunkBlocks(blocks: ParsedBlock[]): PreparedChunk[] {
         });
 
         currentContent = [];
+        currentTokenCount = 0;
     };
 
     for (const block of blocks) {
@@ -38,8 +46,16 @@ export function chunkBlocks(blocks: ParsedBlock[]): PreparedChunk[] {
 
             continue;
         }
+        const blockTokenCount = options.countTokens(block.text);
+        if (
+            currentContent.length > 0 &&
+            currentTokenCount + blockTokenCount > options.targetTokens
+        ) {
+            flushChunk();
+        }
 
         currentContent.push(block.text);
+        currentTokenCount += blockTokenCount;
     }
 
     flushChunk();
