@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cleanText } from "./text.cleaner.js";
+import { cleanText } from "./test.cleaner.js";
 
 describe("cleanText", () => {
     it("collapses repeated spaces", () => {
