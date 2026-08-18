@@ -6,6 +6,10 @@ dist/
 build/
 coverage/
 
+# TypeScript build output accidentally generated inside src
+src/**/*.js
+src/**/*.js.map
+
 # Logs
 logs/
 *.log
