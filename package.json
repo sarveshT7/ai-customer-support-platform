@@ -11,7 +11,8 @@
     "dev": "tsx src/app.ts",
     "db:migrate": "tsx src/database/migrate.ts",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "build":"tsc"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",
