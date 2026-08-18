@@ -4,6 +4,7 @@ export interface PreparedChunk {
     chunkIndex: number;
     content: string;
     section: string;
+    tokenCount: number;
 }
 
 export interface ChunkingOptions {
@@ -64,6 +65,7 @@ export function chunkBlocks(blocks: ParsedBlock[], options: ChunkingOptions): Pr
             chunkIndex: chunks.length,
             content,
             section: sectionPath.join(" > "),
+            tokenCount: currentTokenCount,
         });
 
         if (withOverlap && options.overlapTokens > 0) {

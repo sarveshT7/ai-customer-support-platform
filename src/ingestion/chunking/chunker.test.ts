@@ -49,16 +49,19 @@ describe("chunkBlocks", () => {
                 chunkIndex: 0,
                 content: "Customers can return products within 30 days.",
                 section: "Return Policy",
+                tokenCount: 7
             },
             {
                 chunkIndex: 1,
                 content: "Damaged products must be reported within 7 days.",
                 section: "Return Policy > Damaged Products",
+                tokenCount: 8
             },
             {
                 chunkIndex: 2,
                 content: "Refunds are processed within 5 business days.",
                 section: "Return Policy > Refunds",
+                tokenCount: 7
             },
         ]);
     });
@@ -109,6 +112,10 @@ describe("chunkBlocks", () => {
         expect(result.every((chunk) => chunk.section === "Return Policy")).toBe(
             true
         );
+
+        expect(result[0].tokenCount).toBe(countTokens(result[0].content));
+        expect(result[1].tokenCount).toBe(countTokens(result[1].content));
+        expect(result[2].tokenCount).toBe(countTokens(result[2].content));
     });
     it("splits an oversized block at max token limit", () => {
         const blocks = [
@@ -136,6 +143,10 @@ describe("chunkBlocks", () => {
 
         expect(result.every((chunk) => {
             return countTokens(chunk.content) <= 15;
+        })).toBe(true);
+
+        expect(result.every((chunk) => {
+            return chunk.tokenCount === countTokens(chunk.content);
         })).toBe(true);
     });
     it("adds overlap between chunks", () => {
@@ -179,6 +190,14 @@ describe("chunkBlocks", () => {
 
         expect(result[1].content).toBe(
             "eight nine ten\n\neleven twelve thirteen fourteen fifteen"
+        );
+
+        expect(result[0].tokenCount).toBe(
+            countTokens(result[0].content)
+        );
+
+        expect(result[1].tokenCount).toBe(
+            countTokens(result[1].content)
         );
     });
 });
