@@ -136,6 +136,7 @@ describe("DocumentRepository", () => {
         const results = await repository.searchSimilarChunks(
             vectorA,
             3,
+            document.id
         );
 
         expect(results).toHaveLength(3);

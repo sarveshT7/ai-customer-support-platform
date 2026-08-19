@@ -37,14 +37,18 @@ export class DocumentRepository {
     ): Promise<SimilarChunk[]> {
         const vector = `[${queryEmbedding.join(",")}]`;
 
-        return this.database
+        let query = this.database
             .selectFrom("document_chunks")
             .selectAll()
             .select(
                 sql<number>`embedding <=> ${vector}::vector`.as("distance"),
             )
             .where("embedding", "is not", null)
-            .orderBy("distance", "asc")
+
+        if (documentId) {
+            query = query.where("document_id", "=", documentId);
+        }
+        return query.orderBy("distance", "asc")
             .limit(topK)
             .execute();
     }
