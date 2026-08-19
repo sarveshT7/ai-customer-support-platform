@@ -32,6 +32,9 @@ export class DocumentService {
                 input.chunks.map((chunk) => ({
                     ...chunk,
                     document_id: document.id,
+                    embedding: Array.isArray(chunk.embedding)
+                        ? `[${chunk.embedding.join(",")}]`
+                        : chunk.embedding,
                     metadata: chunk.metadata ?? {},
                 })),
             );

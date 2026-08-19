@@ -4,6 +4,7 @@ import { cleanText } from "../ingestion/cleaning/test.cleaner.js";
 import { chunkingOptions } from "../ingestion/config.js";
 import { parseMarkdown } from "../ingestion/parsers/markdown.parser.js";
 import { documentService, DocumentService } from "./document.service.js";
+import { embeddingService, EmbeddingService } from "./embedding.service.js";
 
 export interface IngestDocumentInput {
     content: string;
@@ -20,6 +21,7 @@ export interface IngestDocumentResult {
 export class IngestionService {
     constructor(
         private readonly documentService: DocumentService,
+        private readonly embeddingService: EmbeddingService,
         private readonly chunkingOptions: ChunkingOptions,
     ) { }
 
@@ -34,6 +36,17 @@ export class IngestionService {
             this.chunkingOptions,
         );
 
+        const embeddings = await this.embeddingService.embedTexts(
+            preparedChunks.map((chunk) => chunk.content)
+        )
+
+
+        if (embeddings.length !== preparedChunks.length) {
+            throw new Error(
+                `Embedding count mismatch: expected ${preparedChunks.length}, received ${embeddings.length}`,
+            );
+        }
+
         const result = await this.documentService.persistDocument({
             document: {
                 title: parsedDocument.title,
@@ -41,11 +54,12 @@ export class IngestionService {
                 source_type: input.sourceType,
                 mime_type: input.mimeType,
             },
-            chunks: preparedChunks.map((chunk) => ({
+            chunks: preparedChunks.map((chunk, index) => ({
                 chunk_index: chunk.chunkIndex,
                 content: chunk.content,
                 section: chunk.section,
                 token_count: chunk.tokenCount,
+                embedding: embeddings[index],
             })),
         });
 
@@ -55,5 +69,6 @@ export class IngestionService {
 
 export const ingestionService = new IngestionService(
     documentService,
+    embeddingService,
     chunkingOptions,
 );

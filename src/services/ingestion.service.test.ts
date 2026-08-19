@@ -5,6 +5,7 @@ import {
 } from "./ingestion.service.js";
 import { DocumentService } from "../services/document.service.js";
 import { chunkingOptions } from "../ingestion/config.js";
+import { EmbeddingService, embeddingService } from "./embedding.service.js";
 
 describe("IngestionService", () => {
     it("persists a parsed and chunked document", async () => {
@@ -20,8 +21,20 @@ describe("IngestionService", () => {
             persistDocument,
         } as unknown as DocumentService;
 
+
+        const embeddings = [
+            [0.1, 0.2, 0.3],
+            [0.4, 0.5, 0.6],
+        ];
+
+        const embeddingService = {
+            embedTexts: vi.fn().mockResolvedValue(embeddings),
+        } as unknown as EmbeddingService;
+
+
         const ingestionService = new IngestionService(
             documentService,
+            embeddingService,
             chunkingOptions,
         );
 
@@ -55,12 +68,15 @@ Refunds are processed within 5 business days.
                     content: "Customers can return products within 30 days.",
                     section: "Return Policy",
                     token_count: 7,
+                    embedding: embeddings[0],
+
                 },
                 {
                     chunk_index: 1,
                     content: "Refunds are processed within 5 business days.",
                     section: "Return Policy > Refunds",
                     token_count: 7,
+                    embedding: embeddings[1],
                 },
             ],
         });
@@ -89,8 +105,16 @@ Refunds are processed within 5 business days.
             persistDocument,
         } as unknown as DocumentService;
 
+        const embeddingService = {
+            embedTexts: vi.fn().mockResolvedValue([
+                [0.1, 0.2, 0.3],
+            ]),
+        } as unknown as EmbeddingService;
+
+
         const ingestionService = new IngestionService(
             documentService,
+            embeddingService,
             chunkingOptions,
         );
 
