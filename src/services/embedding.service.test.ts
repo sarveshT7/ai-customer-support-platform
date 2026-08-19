@@ -24,7 +24,7 @@ describe("EmbeddingService", () => {
             "Customers can return products within 30 days.",
         );
 
-        expect(embedQuery).toHaveBeenCalledWith(
+        expect(embedQuery).toHaveBeenCalledWith(        
             "Customers can return products within 30 days.",
         );
 

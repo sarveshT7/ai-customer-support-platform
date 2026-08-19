@@ -1,10 +1,14 @@
-import { Kysely, Transaction } from "kysely";
+import { Kysely, sql, Transaction } from "kysely";
 import type { Database, DocumentChunkRow, DocumentRow, NewDocumentChunkRow, NewDocumentRow }
     from "../database/index.js";
 import { db } from "../database/kysely/db.js";
 
 
 type DatabaseExecutor = Kysely<Database> | Transaction<Database>;
+
+export interface SimilarChunk extends DocumentChunkRow {
+    distance: number;
+}
 
 export class DocumentRepository {
     constructor(
@@ -24,6 +28,24 @@ export class DocumentRepository {
             .insertInto("document_chunks")
             .values(chunks)
             .returningAll()
+            .execute();
+    }
+    async searchSimilarChunks(
+        queryEmbedding: number[],
+        topK: number,
+        documentId?: string,
+    ): Promise<SimilarChunk[]> {
+        const vector = `[${queryEmbedding.join(",")}]`;
+
+        return this.database
+            .selectFrom("document_chunks")
+            .selectAll()
+            .select(
+                sql<number>`embedding <=> ${vector}::vector`.as("distance"),
+            )
+            .where("embedding", "is not", null)
+            .orderBy("distance", "asc")
+            .limit(topK)
             .execute();
     }
 }
