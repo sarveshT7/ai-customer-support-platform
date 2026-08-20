@@ -7,7 +7,7 @@ export class RetrievalService {
     constructor(
         private readonly embeddingService: EmbeddingService =
             defaultEmbeddingService,
-        private readonly documentRepository = new DocumentRepository(),
+        private readonly documentRepository: DocumentRepository = new DocumentRepository(),
     ) { }
 
     async retrieve(

@@ -3,10 +3,18 @@ import type { Database, DocumentChunkRow, DocumentRow, NewDocumentChunkRow, NewD
     from "../database/index.js";
 import { db } from "../database/kysely/db.js";
 
-
 type DatabaseExecutor = Kysely<Database> | Transaction<Database>;
 
-export interface SimilarChunk extends DocumentChunkRow {
+export interface SimilarChunk {
+    id: string;
+    document_id: string;
+    chunk_index: number;
+    content: string;
+    section: string | null;
+    page_number: number | null;
+    token_count: number | null;
+    metadata: Record<string, unknown>;
+    created_at: Date;
     distance: number;
 }
 
@@ -39,7 +47,17 @@ export class DocumentRepository {
 
         let query = this.database
             .selectFrom("document_chunks")
-            .selectAll()
+            .select([
+                "id",
+                "document_id",
+                "chunk_index",
+                "content",
+                "section",
+                "page_number",
+                "token_count",
+                "metadata",
+                "created_at",
+            ])
             .select(
                 sql<number>`embedding <=> ${vector}::vector`.as("distance"),
             )
@@ -48,7 +66,8 @@ export class DocumentRepository {
         if (documentId) {
             query = query.where("document_id", "=", documentId);
         }
-        return query.orderBy("distance", "asc")
+        return query
+            .orderBy("distance", "asc")
             .limit(topK)
             .execute();
     }

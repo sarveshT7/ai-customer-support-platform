@@ -1,4 +1,4 @@
-import { retrievalService } from "./retrieval.service.js";
+import { retrievalService } from "../retrieval.service.js";
 
 const results = await retrievalService.retrieve(
     "Can I return a product after 20 days?",

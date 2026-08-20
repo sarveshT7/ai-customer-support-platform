@@ -8,5 +8,6 @@ export async function routerNode(state: typeof ParentState.State) {
   const lastMessage = state.messages[state.messages.length - 1];
   const domain = detectDomain(lastMessage.content.toString());
   return { domain }
-
+ 
 }
+       
