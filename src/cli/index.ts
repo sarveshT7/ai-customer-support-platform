@@ -3,7 +3,6 @@ import { HumanMessage } from "@langchain/core/messages";
 import dotenv from "dotenv";
 import { Command } from "@langchain/langgraph";
 import { parentGraph } from "../graphs/parent/graph.js";
-import { orderGraph } from "../graphs/order/graph.js";
 import { fileIngestionService } from "../ingestion/index.js";
 dotenv.config();
 
@@ -56,7 +55,7 @@ export const cliFunction = async () => {
       break;
     }
     // console.log("You typed:", question);
-    let result: any = await orderGraph.invoke({
+    let result: any = await parentGraph.invoke({
       messages: [
         new HumanMessage(question)
       ],

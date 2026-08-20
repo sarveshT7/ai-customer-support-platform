@@ -9,7 +9,6 @@ import { formatRetrievedContext } from "../context-formatter.js";
 export async function agentNode(
   state: typeof SupportState.State
 ) {
-
   const context = formatRetrievedContext(state.retrievedChunks)
   const response = await productModel.invoke([
     SYSTEM_PROMPT,
@@ -23,7 +22,6 @@ export async function agentNode(
     "Tool calls:",
     JSON.stringify(response.tool_calls, null, 2)
   );
-
 
   return {
     messages: [response],
