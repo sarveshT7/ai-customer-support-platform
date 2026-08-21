@@ -42,6 +42,7 @@ export class DocumentRepository {
         queryEmbedding: number[],
         topK: number,
         documentId?: string,
+        maxDistance?: number,
     ): Promise<SimilarChunk[]> {
         const vector = `[${queryEmbedding.join(",")}]`;
 
@@ -65,6 +66,12 @@ export class DocumentRepository {
 
         if (documentId) {
             query = query.where("document_id", "=", documentId);
+        }
+
+        if (maxDistance !== undefined) {
+            query = query.where(
+                sql<boolean>`embedding <=> ${vector}::vector <= ${maxDistance}`,
+            );
         }
         return query
             .orderBy("distance", "asc")

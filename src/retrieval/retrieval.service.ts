@@ -3,6 +3,8 @@ import {
     embeddingService as defaultEmbeddingService,
     EmbeddingService,
 } from "../services/embedding.service.js";
+const DEFAULT_MAX_DISTANCE = 0.5;
+
 export class RetrievalService {
     constructor(
         private readonly embeddingService: EmbeddingService =
@@ -14,6 +16,7 @@ export class RetrievalService {
         query: string,
         topK = 5,
         documentId?: string,
+        maxDistance = DEFAULT_MAX_DISTANCE,
     ): Promise<SimilarChunk[]> {
         const queryEmbedding =
             await this.embeddingService.embedText(query);
@@ -22,6 +25,7 @@ export class RetrievalService {
             queryEmbedding,
             topK,
             documentId,
+            maxDistance,
         );
     }
 }

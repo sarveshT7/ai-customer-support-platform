@@ -54,6 +54,7 @@ describe("RetrievalService", () => {
             queryEmbedding,
             5,
             undefined,
+            0.5,
         );
 
         expect(result).toEqual(similarChunks);
@@ -95,6 +96,50 @@ describe("RetrievalService", () => {
             queryEmbedding,
             3,
             "document-123",
+            0.5,
+        );
+
+        expect(result).toEqual(similarChunks);
+    });
+
+    it("passes maxDistance when provided", async () => {
+        const queryEmbedding = Array(1536).fill(0);
+        queryEmbedding[0] = 1;
+
+        const similarChunks: SimilarChunk[] = [];
+
+        const embeddingService = {
+            embedText: vi.fn().mockResolvedValue(queryEmbedding),
+            embedTexts: vi.fn(),
+        } as EmbeddingService;
+
+        const documentRepository = {
+            searchSimilarChunks: vi.fn().mockResolvedValue(similarChunks),
+        } as unknown as DocumentRepository;
+
+        const service = new RetrievalService(
+            embeddingService,
+            documentRepository,
+        );
+
+        const result = await service.retrieve(
+            "What is the return policy?",
+            5,
+            undefined,
+            0.4,
+        );
+
+        expect(embeddingService.embedText).toHaveBeenCalledWith(
+            "What is the return policy?",
+        );
+
+        expect(
+            documentRepository.searchSimilarChunks,
+        ).toHaveBeenCalledWith(
+            queryEmbedding,
+            5,
+            undefined,
+            0.4,
         );
 
         expect(result).toEqual(similarChunks);

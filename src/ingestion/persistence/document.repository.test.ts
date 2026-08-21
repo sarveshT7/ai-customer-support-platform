@@ -149,4 +149,61 @@ describe("DocumentRepository", () => {
         expect(results[1].distance).toBeCloseTo(1);
         expect(results[2].distance).toBeCloseTo(2);
     });
+
+    it("filters chunks by maximum vector distance", async () => {
+        const document = await repository.createDocument({
+            title: "Vector Threshold Test",
+            source: "vector-threshold-test.md",
+            source_type: "markdown",
+            mime_type: "text/markdown",
+            metadata: {},
+        });
+
+        const queryVector = Array(1536).fill(0);
+        queryVector[0] = 1;
+
+        const similarVector = Array(1536).fill(0);
+        similarVector[0] = 1;
+
+        const lessSimilarVector = Array(1536).fill(0);
+        lessSimilarVector[0] = 0;
+        lessSimilarVector[1] = 1;
+
+        const toVector = (vector: number[]) =>
+            `[${vector.join(",")}]`;
+
+        await repository.createChunks([
+            {
+                document_id: document.id,
+                chunk_index: 0,
+                content: "Relevant chunk.",
+                section: null,
+                page_number: null,
+                token_count: 2,
+                embedding: toVector(similarVector),
+                metadata: {},
+            },
+            {
+                document_id: document.id,
+                chunk_index: 1,
+                content: "Less relevant chunk.",
+                section: null,
+                page_number: null,
+                token_count: 3,
+                embedding: toVector(lessSimilarVector),
+                metadata: {},
+            },
+        ]);
+
+        const results = await repository.searchSimilarChunks(
+            queryVector,
+            5,
+            undefined,
+            0.1,
+        );
+
+        expect(results).toHaveLength(1);
+        expect(results[0].chunk_index).toBe(0);
+        expect(results[0].distance).toBeCloseTo(0);
+    });
 });
