@@ -201,7 +201,6 @@ describe("DocumentRepository", () => {
             undefined,
             0.1,
         );
-
         expect(results).toHaveLength(1);
         expect(results[0].chunk_index).toBe(0);
         expect(results[0].distance).toBeCloseTo(0);

@@ -8,6 +8,8 @@ type DatabaseExecutor = Kysely<Database> | Transaction<Database>;
 export interface SimilarChunk {
     id: string;
     document_id: string;
+    document_title: string | null;
+    source: string;
     chunk_index: number;
     content: string;
     section: string | null;
@@ -47,32 +49,40 @@ export class DocumentRepository {
         const vector = `[${queryEmbedding.join(",")}]`;
 
         let query = this.database
-            .selectFrom("document_chunks")
+            .selectFrom("document_chunks as dc")
+            .innerJoin("documents as d", "d.id", "dc.document_id")
             .select([
-                "id",
-                "document_id",
-                "chunk_index",
-                "content",
-                "section",
-                "page_number",
-                "token_count",
-                "metadata",
-                "created_at",
+                "dc.id",
+                "dc.document_id",
+                "d.title as document_title",
+                "d.source",
+                "dc.chunk_index",
+                "dc.content",
+                "dc.section",
+                "dc.page_number",
+                "dc.token_count",
+                "dc.metadata",
+                "dc.created_at",
             ])
             .select(
-                sql<number>`embedding <=> ${vector}::vector`.as("distance"),
+                sql<number>`
+                dc.embedding <=> ${vector}::vector
+            `.as("distance"),
             )
-            .where("embedding", "is not", null)
+            .where("dc.embedding", "is not", null);
 
         if (documentId) {
-            query = query.where("document_id", "=", documentId);
+            query = query.where("dc.document_id", "=", documentId);
         }
 
         if (maxDistance !== undefined) {
             query = query.where(
-                sql<boolean>`embedding <=> ${vector}::vector <= ${maxDistance}`,
+                sql<boolean>`
+                dc.embedding <=> ${vector}::vector <= ${maxDistance}
+            `,
             );
         }
+
         return query
             .orderBy("distance", "asc")
             .limit(topK)

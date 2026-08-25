@@ -11,6 +11,8 @@ describe("retrievalNode", () => {
             {
                 id: "chunk-1",
                 document_id: "document-1",
+                document_title: "Return Policy",
+                source: "src/data/documents/return-policy.md",
                 chunk_index: 0,
                 content: "Customers can return products within 30 days.",
                 section: "Returns",
