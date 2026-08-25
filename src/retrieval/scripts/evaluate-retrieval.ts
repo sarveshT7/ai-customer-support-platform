@@ -11,8 +11,20 @@ const evaluationCases: EvaluationCase[] = [
         expectedChunkIndex: 0,
     },
     {
+        query: "How long after purchase can I return something?",
+        expectedChunkIndex: 0,
+    },
+    {
         query: "When will I receive my refund?",
         expectedChunkIndex: 2,
+    },
+    {
+        query: "How long does an approved refund take?",
+        expectedChunkIndex: 2,
+    },
+    {
+        query: "How many days do I have to report a damaged product?",
+        expectedChunkIndex: 1,
     },
     {
         query: "What is the warranty period?",
