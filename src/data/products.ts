@@ -1,4 +1,6 @@
-export const products = [
+import type { Product } from "../models/product.js";
+
+export const products: Product[] = [
     {
         productId: "P-101",
         name: "Logitech G102",
@@ -18,7 +20,7 @@ export const products = [
         rating: 4.8,
     },
     {
-        id: "P-103",
+        productId: "P-103",
         name: "USB-C Hub",
         category: "Accessories",
         brand: "Logitech",

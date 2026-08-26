@@ -8,4 +8,13 @@ export type {
   DocumentChunkRow,
   NewDocumentChunkRow,
   DocumentChunkRowUpdate,
+  ProductRow,
+  NewProductRow,
+  ProductRowUpdate,
+  OrderRow,
+  NewOrderRow,
+  OrderRowUpdate,
+  TicketRow,
+  NewTicketRow,
+  TicketRowUpdate,
 } from "./types.js";

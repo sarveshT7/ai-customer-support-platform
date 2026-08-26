@@ -1,35 +1,22 @@
 import { tool } from "@langchain/core/tools";
 import z from "zod";
-import { Ticket, TicketPriority } from "../models/ticket.js";
-import { tickets } from "../data/tickets.js";
+import { TICKET_CATEGORIES, TICKET_PRIORITIES, TicketCategory, TicketPriority } from "../models/ticket.js";
+import { ticketService } from "../services/ticket.service.js";
 import { withRetry } from "../graphs/ticket/retry.js";
 
-let shouldFail = true;
-
 export const createTicketTool = tool(
-    async ({ issue, category, priority, orderId }: { issue: string, category: string, priority: TicketPriority, orderId: string }) => {
+    async ({ issue, category, priority, orderId }: { issue: string, category: TicketCategory, priority: TicketPriority, orderId: string }) => {
         return withRetry(async () => {
-            // if (shouldFail) {
-                // console.log("shouldFail:", shouldFail);
-                // shouldFail = false;
-                throw new Error("Simulated timeout");
-            // }
-
-            const ticket: Ticket = {
-                ticketId: `TKT-${crypto.randomUUID()}`,
+            const ticket = await ticketService.createTicket({
                 issue,
                 category,
                 orderId,
                 priority,
-                status: "Open",
-                createdAt: new Date().toISOString(),
-            }
-
-            tickets.push(ticket);
+            });
 
             return {
                 success: true,
-                ticket
+                ticket,
             }
         })
     },
@@ -53,20 +40,12 @@ export const createTicketTool = tool(
         - Critical: Severe safety or business-impacting issues.
 `,
         schema: z.object({
-            // customerId: z.string().describe("The customer ID"),
             issue: z.string().describe("A concise summary of the customer's issue. Example: 'Laptop won't turn on.'"),
-            category: z.enum([
-                "Technical",
-                "Delivery",
-                "Damaged Product",
-                "Refund",
-                "Payment",
-                "Warranty"
-            ])
+            category: z.enum(TICKET_CATEGORIES)
                 .describe("Support ticket category."),
             orderId: z.string().describe("The order ID, for example ORD-1001. Use the exact field name orderId.").min(1),
 
-            priority: z.enum(["Low", "Medium", "High", "Critical"])
+            priority: z.enum(TICKET_PRIORITIES)
                 .describe("Low for minor issues, Medium for normal support, High for urgent issues, Critical for severe safety or business-impacting issues.Choose exactly one of: Low, Medium, High, Critical."),
         })
     }

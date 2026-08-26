@@ -1,3 +1,15 @@
+export const PRODUCT_CATEGORIES = [
+    "Mouse",
+    "Keyboard",
+    "Accessories",
+    "Laptop",
+    "Monitor",
+    "Audio",
+    "Storage",
+] as const;
+
+export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number];
+
 export interface Product {
     productId: string;
     name: string;
@@ -7,5 +19,3 @@ export interface Product {
     rating: number;
     brand: string;
 }
-
-export type ProductCategory = "Mouse" | "Keyboard" | "Accessories" | "Laptop" | "Desktop";
