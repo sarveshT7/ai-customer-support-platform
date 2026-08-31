@@ -5,8 +5,8 @@ dotenv.config();
 
 export const embeddings = new OpenAIEmbeddings({
     apiKey: process.env.OPENROUTER_API_KEY,
-    model: "openai/text-embedding-3-small",
+    model: process.env.OPENROUTER_EMBEDDING_MODEL ?? "openai/text-embedding-3-small",
     configuration: {
-        baseURL: "https://openrouter.ai/api/v1",
+        baseURL: process.env.OPENROUTER_BASE_URL ?? "https://openrouter.ai/api/v1",
     },
 })

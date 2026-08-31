@@ -40,4 +40,22 @@ describe("TicketService", () => {
             }),
         ).rejects.toThrow();
     });
+
+    it("returns a mapped ticket for an existing id", async () => {
+        const created = await service.createTicket({
+            issue: "Laptop won't turn on.",
+            category: "Technical",
+            orderId: "ORD-1001",
+            priority: "High",
+        });
+
+        const ticket = await service.getTicket(created.ticketId);
+
+        expect(ticket).toEqual(created);
+    });
+
+    it("returns null for a ticket that does not exist", async () => {
+        const ticket = await service.getTicket("TKT-MISSING");
+        expect(ticket).toBeNull();
+    });
 });

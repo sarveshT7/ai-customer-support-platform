@@ -12,6 +12,16 @@ export class TicketRepository {
             .returningAll()
             .executeTakeFirstOrThrow();
     }
+
+    async findById(ticketId: string): Promise<TicketRow | null> {
+        const ticket = await this.database
+            .selectFrom("tickets")
+            .selectAll()
+            .where("ticket_id", "=", ticketId)
+            .executeTakeFirst();
+
+        return ticket ?? null;
+    }
 }
 
 export const ticketRepository = new TicketRepository();

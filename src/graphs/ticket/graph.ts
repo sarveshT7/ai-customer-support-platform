@@ -38,7 +38,7 @@ export const ticketGraph = new StateGraph(SupportState)
   .addConditionalEdges(
     "verifyOrder",
     (state) => {
-      return state.ticket.orderExists
+      return state.ticket.orderExists && state.ticket.eligible !== false
         ? "agent"
         : "ticketResponse";
     },

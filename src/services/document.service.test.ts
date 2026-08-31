@@ -1,8 +1,15 @@
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, afterEach, describe, expect, it } from "vitest";
 import { documentService } from "./document.service.js";
 import { closeDb, db } from "../database/kysely/db.js";
 
 describe("DocumentService", () => {
+    afterEach(async () => {
+        await db
+            .deleteFrom("documents")
+            .where("source", "like", "%service-test-%")
+            .execute();
+    });
+
     afterAll(async () => {
         await closeDb();
     });
@@ -88,5 +95,71 @@ describe("DocumentService", () => {
             .execute();
 
         expect(documents).toHaveLength(0);
+    });
+
+    it("replaces the prior document and chunks when the same source is re-ingested", async () => {
+        const source = `dedup-service-test-${Date.now()}.md`;
+
+        const first = await documentService.persistDocument({
+            document: {
+                title: "Original Title",
+                source,
+                source_type: "markdown",
+                mime_type: "text/markdown",
+                metadata: {},
+            },
+            chunks: [
+                {
+                    chunk_index: 0,
+                    content: "Original content.",
+                    metadata: {},
+                },
+            ],
+        });
+
+        const second = await documentService.persistDocument({
+            document: {
+                title: "Updated Title",
+                source,
+                source_type: "markdown",
+                mime_type: "text/markdown",
+                metadata: {},
+            },
+            chunks: [
+                {
+                    chunk_index: 0,
+                    content: "Updated content, first chunk.",
+                    metadata: {},
+                },
+                {
+                    chunk_index: 1,
+                    content: "Updated content, second chunk.",
+                    metadata: {},
+                },
+            ],
+        });
+
+        const documents = await db
+            .selectFrom("documents")
+            .selectAll()
+            .where("source", "=", source)
+            .execute();
+        expect(documents).toHaveLength(1);
+        expect(documents[0].id).toBe(second.document.id);
+        expect(documents[0].title).toBe("Updated Title");
+
+        const oldChunks = await db
+            .selectFrom("document_chunks")
+            .selectAll()
+            .where("document_id", "=", first.document.id)
+            .execute();
+        expect(oldChunks).toHaveLength(0);
+
+        const newChunks = await db
+            .selectFrom("document_chunks")
+            .selectAll()
+            .where("document_id", "=", second.document.id)
+            .execute();
+        expect(newChunks).toHaveLength(2);
     });
 });

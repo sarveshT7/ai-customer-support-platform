@@ -1,11 +1,11 @@
 import { tool } from "@langchain/core/tools";
 import z from "zod";
 import { orderService } from "../services/order.service.js";
+import { withRetry } from "../lib/retry.js";
 
 export const getOrderTool = tool(
     async ({ orderId }: { orderId: string }) => {
-        const result = await orderService.getOrder(orderId)
-        return result
+        return withRetry(() => orderService.getOrder(orderId));
     },
     {
         name: "get_order",

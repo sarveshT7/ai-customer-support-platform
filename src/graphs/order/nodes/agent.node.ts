@@ -1,15 +1,12 @@
-import { AIMessage } from "@langchain/core/messages";
-import { interrupt } from "@langchain/langgraph";
-
 import { SupportState } from "../state.js";
-import { SYSTEM_PROMPT } from "../../../prompts/system.prompt.js";
+import { ORDER_SYSTEM_PROMPT } from "../../../prompts/system.prompt.js";
 import { orderModel } from "../model.js";
 
 export async function agentNode(
   state: typeof SupportState.State
 ) {
   const response = await orderModel.invoke([
-    SYSTEM_PROMPT,
+    ORDER_SYSTEM_PROMPT,
     ...state.messages,
   ]);
 

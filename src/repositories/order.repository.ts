@@ -30,6 +30,24 @@ export class OrderRepository {
 
         return order;
     }
+
+    // Atomically transitions status only if the order is currently in expectedStatus,
+    // avoiding a read-then-write race with a concurrent status change.
+    async updateStatusIfCurrent(
+        orderId: string,
+        expectedStatus: OrderStatus,
+        newStatus: OrderStatus
+    ): Promise<OrderRow | null> {
+        const order = await this.database
+            .updateTable("orders")
+            .set({ status: newStatus, updated_at: new Date() })
+            .where("order_id", "=", orderId)
+            .where("status", "=", expectedStatus)
+            .returningAll()
+            .executeTakeFirst();
+
+        return order ?? null;
+    }
 }
 
 export const orderRepository = new OrderRepository();

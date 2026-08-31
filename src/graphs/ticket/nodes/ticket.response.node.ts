@@ -6,8 +6,8 @@ export async function ticketResponseNode(
 ) {
     const ticket = state.ticket;
 
-    // Order verification failed
-    if (ticket.orderExists === false && ticket.requested) {
+    // Order verification failed, or the order isn't eligible for this kind of ticket yet
+    if ((ticket.orderExists === false || ticket.eligible === false) && ticket.requested) {
         return {
             messages: [
                 new AIMessage(
@@ -19,6 +19,7 @@ export async function ticketResponseNode(
                 orderId: undefined,
                 verified: false,
                 orderExists: undefined,
+                eligible: undefined,
                 message: undefined,
             },
         };

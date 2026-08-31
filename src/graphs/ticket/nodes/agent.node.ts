@@ -1,8 +1,7 @@
-import { AIMessage, HumanMessage } from "@langchain/core/messages";
-import { interrupt } from "@langchain/langgraph";
+import { HumanMessage } from "@langchain/core/messages";
 
 import { SupportState } from "../state.js";
-import { SYSTEM_PROMPT } from "../../../prompts/system.prompt.js";
+import { TICKET_SYSTEM_PROMPT } from "../../../prompts/system.prompt.js";
 import { ticketModel } from "../model.js";
 
 export async function agentNode(
@@ -14,7 +13,7 @@ export async function agentNode(
   `;
 
   const response = await ticketModel.invoke([
-    SYSTEM_PROMPT,
+    TICKET_SYSTEM_PROMPT,
     ...state.messages,
     new HumanMessage(ticketContext),
   ]);

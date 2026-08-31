@@ -24,6 +24,13 @@ export class DocumentRepository {
     constructor(
         private readonly database: DatabaseExecutor = db,
     ) { }
+    async deleteBySource(source: string): Promise<void> {
+        await this.database
+            .deleteFrom("documents")
+            .where("source", "=", source)
+            .execute();
+    }
+
     async createDocument(input: NewDocumentRow): Promise<DocumentRow> {
         return this.database
             .insertInto("documents")

@@ -11,6 +11,9 @@ const pool = new Pool({
   user: config.user,
   password: config.password,
   database: config.database,
+  max: 10,
+  idleTimeoutMillis: 30_000,
+  connectionTimeoutMillis: 5_000,
 });
 
 pool.on("error", (error) => {

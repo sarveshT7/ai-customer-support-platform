@@ -94,4 +94,35 @@ describe("OrderService", () => {
             message: "Order not found",
         });
     });
+
+    it("only lets one of two concurrent cancel requests succeed", async () => {
+        await db
+            .insertInto("orders")
+            .values({
+                order_id: "ORD-SVC-TEST-5",
+                customer: "Test Customer",
+                status: "Processing",
+                expected_delivery: "Tomorrow",
+            })
+            .execute();
+
+        const [first, second] = await Promise.all([
+            service.cancelOrder("ORD-SVC-TEST-5"),
+            service.cancelOrder("ORD-SVC-TEST-5"),
+        ]);
+
+        const results = [first, second];
+        const succeeded = results.filter((result) => result.success);
+        const failed = results.filter((result) => !result.success);
+
+        expect(succeeded).toHaveLength(1);
+        expect(failed).toHaveLength(1);
+        expect(failed[0]).toEqual({
+            success: false,
+            message: "Only processing orders can be cancelled.",
+        });
+
+        const finalOrder = await service.getOrder("ORD-SVC-TEST-5");
+        expect(finalOrder?.status).toBe("Cancelled");
+    });
 });

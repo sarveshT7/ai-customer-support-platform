@@ -23,6 +23,10 @@ export class DocumentService {
         return await db.transaction().execute(async (trx) => {
             const documentRepository = new DocumentRepository(trx);
 
+            // Re-ingesting the same source replaces its prior document and chunks
+            // (which cascade-delete) rather than accumulating duplicates.
+            await documentRepository.deleteBySource(input.document.source);
+
             const document = await documentRepository.createDocument({
                 ...input.document,
                 metadata: input.document.metadata ?? {},

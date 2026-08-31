@@ -36,6 +36,11 @@ export class TicketService {
 
         return toTicket(row);
     }
+
+    async getTicket(ticketId: string): Promise<Ticket | null> {
+        const row = await this.repository.findById(ticketId);
+        return row ? toTicket(row) : null;
+    }
 }
 
 export const ticketService = new TicketService();

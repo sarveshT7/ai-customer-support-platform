@@ -2,7 +2,7 @@ import { tool } from "@langchain/core/tools";
 import z from "zod";
 import { TICKET_CATEGORIES, TICKET_PRIORITIES, TicketCategory, TicketPriority } from "../models/ticket.js";
 import { ticketService } from "../services/ticket.service.js";
-import { withRetry } from "../graphs/ticket/retry.js";
+import { withRetry } from "../lib/retry.js";
 
 export const createTicketTool = tool(
     async ({ issue, category, priority, orderId }: { issue: string, category: TicketCategory, priority: TicketPriority, orderId: string }) => {

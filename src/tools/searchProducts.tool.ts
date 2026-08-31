@@ -2,11 +2,14 @@ import { tool } from "@langchain/core/tools";
 import z from "zod";
 import { PRODUCT_CATEGORIES, ProductCategory } from "../models/product.js";
 import { productService } from "../services/product.service.js";
+import { withRetry } from "../lib/retry.js";
 
 
 export const searchProductsTool = tool(
     async ({ category, maxPrice }: { category?: ProductCategory, maxPrice?: number }) => {
-        const products = await productService.searchProducts({ category, maxPrice });
+        const products = await withRetry(() =>
+            productService.searchProducts({ category, maxPrice })
+        );
 
         return {
             products

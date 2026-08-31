@@ -12,6 +12,7 @@ export const SupportState = Annotation.Root({
         orderId?: string;
         verified?: boolean;
         orderExists?: boolean;
+        eligible?: boolean;
         message?: string;
         created?: boolean;
         ticketId?: string;

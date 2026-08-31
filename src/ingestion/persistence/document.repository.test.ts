@@ -9,8 +9,17 @@ describe("DocumentRepository", () => {
         await closeDb();
     });
 
+    const OWN_SOURCES = [
+        "return-policy.md",
+        "vector-search-test.md",
+        "vector-threshold-test.md",
+    ];
+
     afterEach(async () => {
-        await db.deleteFrom("documents").execute();
+        await db
+            .deleteFrom("documents")
+            .where("source", "in", OWN_SOURCES)
+            .execute();
     });
 
     it("creates and returns a document", async () => {

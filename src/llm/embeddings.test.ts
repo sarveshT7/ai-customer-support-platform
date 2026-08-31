@@ -12,5 +12,5 @@ describe("OpenRouter embeddings", () => {
         expect(result.every((value) => typeof value === "number")).toBe(true);
 
         console.log("Embedding dimensions:", result.length);
-    });
+    }, 15_000);
 });

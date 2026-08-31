@@ -1,15 +1,17 @@
 import readLine from "node:readline/promises";
-import { HumanMessage } from "@langchain/core/messages";
+import { BaseMessage, HumanMessage } from "@langchain/core/messages";
 import dotenv from "dotenv";
 import { Command } from "@langchain/langgraph";
 import { parentGraph } from "../graphs/parent/graph.js";
+import { ParentState } from "../graphs/parent/state.js";
 import { fileIngestionService } from "../ingestion/index.js";
 dotenv.config();
 
+type ParentGraphResult = (typeof ParentState.State) & {
+  __interrupt__?: unknown[];
+};
+
 export const cliFunction = async () => {
-  // console.log(process.env.LANGSMITH_TRACING);
-  // console.log(process.env.LANGSMITH_PROJECT);
-  // console.log(process.env.LANGSMITH_API_KEY?.slice(0, 10));
   const args = process.argv.slice(2);
 
   if (args[0] === "ingest") {
@@ -54,93 +56,41 @@ export const cliFunction = async () => {
     if (question.toLowerCase() === "exit") {
       break;
     }
-    // console.log("You typed:", question);
-    let result: any = await parentGraph.invoke({
-      messages: [
-        new HumanMessage(question)
-      ],
-    },
-      config
-    );
-    console.log('before cli result', result);
-
-    // Check if the graph is interrupted
-    if ("__interrupt__" in result) {
-      console.log('Interrupted:', result.__interrupt__[0].value);
-      const approval = await rl.question("(y/n): ");
-      result = await parentGraph.invoke(
-        new Command({
-          resume: approval
-        }),
+    let result: ParentGraphResult;
+    try {
+      result = await parentGraph.invoke({
+        messages: [
+          new HumanMessage(question)
+        ],
+      },
         config
-      )
+      );
 
+      // Check if the graph is interrupted
+      if (result.__interrupt__) {
+        console.log('Interrupted:', result.__interrupt__[0]);
+        const approval = await rl.question("(y/n): ");
+        result = await parentGraph.invoke(
+          new Command({
+            resume: approval
+          }),
+          config
+        )
+
+      }
+    } catch (error) {
+      console.error("Error handling request:", error);
+      console.log(
+        "\nAI: Sorry, I'm having trouble reaching the AI service right now. Please try again in a moment."
+      );
+      continue;
     }
-    // console.log('after cli result', result);
-    const lastMessage: any = result?.messages[result?.messages?.length - 1];
+    const lastMessage: BaseMessage | undefined = result.messages.at(-1);
 
     console.log("\nAI:", lastMessage?.content);
-    // console.log("AI:", result);
-    // console.log();
   }
 
   rl.close();
 
   console.log("👋 Goodbye!");
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // const result = await graph.invoke({
-// //   userMessage: "Explain JWT in one paragraph.",
-// // });
-
-// import { HumanMessage } from "@langchain/core/messages";
-// import { graph } from "../graph/graph.js";
-
-// // console.log(result);
-
-// const config = {
-//   configurable: {
-//     thread_id: "customer-1"
-//   }
-// }
-
-
-//  await graph.invoke({
-//   messages: [
-//     new HumanMessage("Where is my order ORD-1001?")
-//   ]
-// },
-//   config
-// );
-
-// const result = await graph.invoke({
-//   messages: [
-//     new HumanMessage("When will it arrive?")
-//   ]
-// },
-//   config
-// );
-
-
-
-
-// console.log('test', result);
-
-
-
-
-

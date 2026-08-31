@@ -20,6 +20,21 @@ export class OrderService {
     }
 
     async cancelOrder(orderId: string) {
+        const updatedRow = await this.repository.updateStatusIfCurrent(
+            orderId,
+            "Processing",
+            "Cancelled"
+        );
+
+        if (updatedRow) {
+            return {
+                success: true,
+                message: "Order cancelled successfully",
+                order: toOrder(updatedRow),
+            };
+        }
+
+        // The conditional update matched no row — find out why, for an accurate message.
         const row = await this.repository.findById(orderId);
         if (!row) {
             return {
@@ -28,18 +43,9 @@ export class OrderService {
             };
         }
 
-        if (row.status !== "Processing") {
-            return {
-                success: false,
-                message: "Only processing orders can be cancelled.",
-            };
-        }
-
-        const updatedRow = await this.repository.updateStatus(orderId, "Cancelled");
         return {
-            success: true,
-            message: "Order cancelled successfully",
-            order: toOrder(updatedRow),
+            success: false,
+            message: "Only processing orders can be cancelled.",
         };
     }
 }

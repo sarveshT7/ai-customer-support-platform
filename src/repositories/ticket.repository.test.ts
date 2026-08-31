@@ -57,4 +57,25 @@ describe("TicketRepository", () => {
             }),
         ).rejects.toThrow();
     });
+
+    it("finds a ticket by id", async () => {
+        await repository.create({
+            ticket_id: "TKT-REPO-TEST-4",
+            issue: "Laptop won't turn on.",
+            category: "Technical",
+            order_id: "ORD-1001",
+            priority: "High",
+            status: "Open",
+        });
+
+        const ticket = await repository.findById("TKT-REPO-TEST-4");
+
+        expect(ticket?.ticket_id).toBe("TKT-REPO-TEST-4");
+        expect(ticket?.status).toBe("Open");
+    });
+
+    it("returns null when the ticket does not exist", async () => {
+        const ticket = await repository.findById("TKT-MISSING");
+        expect(ticket).toBeNull();
+    });
 });
