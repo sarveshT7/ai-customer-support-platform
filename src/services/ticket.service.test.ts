@@ -1,15 +1,18 @@
-import { afterAll, afterEach, describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 import { closeDb, db } from "../database/kysely/db.js";
 import { TicketService } from "./ticket.service.js";
 
 describe("TicketService", () => {
     const service = new TicketService();
-
-    afterEach(async () => {
-        await db.deleteFrom("tickets").execute();
-    });
+    const createdTicketIds: string[] = [];
 
     afterAll(async () => {
+        if (createdTicketIds.length > 0) {
+            await db
+                .deleteFrom("tickets")
+                .where("ticket_id", "in", createdTicketIds)
+                .execute();
+        }
         await closeDb();
     });
 
@@ -20,6 +23,7 @@ describe("TicketService", () => {
             orderId: "ORD-1001",
             priority: "High",
         });
+        createdTicketIds.push(ticket.ticketId);
 
         expect(ticket.ticketId).toMatch(/^TKT-/);
         expect(ticket.issue).toBe("Laptop won't turn on.");
@@ -48,6 +52,7 @@ describe("TicketService", () => {
             orderId: "ORD-1001",
             priority: "High",
         });
+        createdTicketIds.push(created.ticketId);
 
         const ticket = await service.getTicket(created.ticketId);
 

@@ -61,6 +61,7 @@ const PRODUCT_RULES = `
     - Do not invent or modify source names.
     - If no relevant knowledge base context is available, clearly state that the information is not available in the knowledge base.
     - If retrieved context is empty or doesn't contain the answer, don't use the model's general knowledge to fill the gap.
+    - Do not combine, add, or calculate a new figure from multiple separately-stated facts in the retrieved context (e.g. adding a return window to a refund-processing time to produce a "total days" answer), even if each individual fact is correctly grounded. State each retrieved fact as written. If the customer's question asks for a combined or total figure that the context does not explicitly state, say that the exact combined timeframe isn't specified, and give the individual facts instead of computing one yourself.
 `;
 
 export const ORDER_SYSTEM_PROMPT = new SystemMessage(SHARED_PREAMBLE + ORDER_RULES);

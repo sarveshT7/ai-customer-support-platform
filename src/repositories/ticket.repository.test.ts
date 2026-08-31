@@ -6,7 +6,10 @@ describe("TicketRepository", () => {
     const repository = new TicketRepository();
 
     afterEach(async () => {
-        await db.deleteFrom("tickets").execute();
+        await db
+            .deleteFrom("tickets")
+            .where("ticket_id", "like", "TKT-REPO-TEST-%")
+            .execute();
     });
 
     afterAll(async () => {
