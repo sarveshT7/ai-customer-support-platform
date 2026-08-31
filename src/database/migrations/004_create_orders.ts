@@ -1,5 +1,4 @@
 import { Kysely, sql } from "kysely";
-import { orders } from "../../data/orders.js";
 import { ORDER_STATUSES } from "../../models/order.js";
 
 export async function up(db: Kysely<any>): Promise<void> {
@@ -24,20 +23,6 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.notNull().defaultTo(sql`now()`),
     )
     .execute();
-
-  if (orders.length > 0) {
-    await db
-      .insertInto("orders")
-      .values(
-        orders.map((order) => ({
-          order_id: order.orderId,
-          customer: order.customer,
-          status: order.status,
-          expected_delivery: order.expectedDelivery,
-        })),
-      )
-      .execute();
-  }
 }
 
 export async function down(db: Kysely<any>): Promise<void> {

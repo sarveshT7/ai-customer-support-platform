@@ -242,10 +242,19 @@ Run database migrations:
 npm run db:migrate
 ```
 
-For the test database:
+Seed product and order data (from `src/data/products.ts` and `src/data/orders.ts`). This is
+separate from migrations and safe to re-run any time you edit those files — it upserts by
+primary key, so existing rows are updated and new entries are inserted:
+
+```bash
+npm run db:seed
+```
+
+For the test database, run both against it as well:
 
 ```bash
 NODE_ENV=test npm run db:migrate
+NODE_ENV=test npm run db:seed
 ```
 
 ## 9. RAG Document Ingestion

@@ -10,6 +10,7 @@
     "scripts": {
         "dev": "tsx src/app.ts",
         "db:migrate": "tsx src/database/migrate.ts",
+        "db:seed": "tsx src/database/seed.ts",
         "test": "NODE_ENV=test vitest",
         "test:run": "NODE_ENV=test vitest run",
         "build": "tsc"

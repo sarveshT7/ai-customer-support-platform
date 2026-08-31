@@ -1,5 +1,4 @@
 import { Kysely, sql } from "kysely";
-import { products } from "../../data/products.js";
 import { PRODUCT_CATEGORIES } from "../../models/product.js";
 
 export async function up(db: Kysely<any>): Promise<void> {
@@ -41,23 +40,6 @@ export async function up(db: Kysely<any>): Promise<void> {
     .on("products")
     .column("price")
     .execute();
-
-  if (products.length > 0) {
-    await db
-      .insertInto("products")
-      .values(
-        products.map((product) => ({
-          product_id: product.productId,
-          name: product.name,
-          category: product.category,
-          brand: product.brand,
-          price: product.price,
-          stock: product.stock,
-          rating: product.rating,
-        })),
-      )
-      .execute();
-  }
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
