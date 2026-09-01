@@ -13,26 +13,41 @@ const TOP_K = 5;
 
 type EvaluationCase = { query: string; expectedChunkIndex: number | null };
 
+// return-policy.md was substantially expanded to 11 sections; chunk indices below reflect
+// that current structure (verified against actual chunkBlocks() output, not assumed).
 const knownAnswerCases: EvaluationCase[] = [
     { query: "Can I return a product within 30 days?", expectedChunkIndex: 0 },
     {
         query: "How long after purchase can I return something?",
         expectedChunkIndex: 0,
     },
-    { query: "When will I receive my refund?", expectedChunkIndex: 2 },
-    { query: "How long does an approved refund take?", expectedChunkIndex: 2 },
+    { query: "When will I receive my refund?", expectedChunkIndex: 3 },
+    { query: "How long does an approved refund take?", expectedChunkIndex: 3 },
     {
         query: "How many days do I have to report a damaged product?",
         expectedChunkIndex: 1,
     },
+    { query: "Can I exchange my product?", expectedChunkIndex: 5 },
+    { query: "What is the warranty period?", expectedChunkIndex: 6 },
 ];
 
 const noContextCases: EvaluationCase[] = [
-    { query: "What is the warranty period?", expectedChunkIndex: null },
+    {
+        query: "Do you offer price matching with competitors?",
+        expectedChunkIndex: null,
+    },
 ];
 
 describe("Retrieval evaluation (return-policy.md)", () => {
+    const originalRerankEnabled = process.env.RAG_RERANK_ENABLED;
+
     beforeAll(async () => {
+        // This suite evaluates raw vector-search quality and runs on every `npm test`.
+        // Reranking calls the real (free-tier, rate-limited) OpenRouter rerank endpoint —
+        // disable it here so routine test runs never consume that shared quota. Real rerank
+        // quality is checked deliberately via scripts/check-rerank-quality.ts instead.
+        process.env.RAG_RERANK_ENABLED = "false";
+
         // Idempotent: clear out any leftover rows from a prior interrupted run.
         await db.deleteFrom("documents").where("source", "=", SOURCE).execute();
 
@@ -46,6 +61,12 @@ describe("Retrieval evaluation (return-policy.md)", () => {
     }, 30_000);
 
     afterAll(async () => {
+        if (originalRerankEnabled === undefined) {
+            delete process.env.RAG_RERANK_ENABLED;
+        } else {
+            process.env.RAG_RERANK_ENABLED = originalRerankEnabled;
+        }
+
         await db.deleteFrom("documents").where("source", "=", SOURCE).execute();
         await closeDb();
     });
